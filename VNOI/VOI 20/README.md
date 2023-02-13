@@ -5,3 +5,6 @@ https://oj.vnoi.info/contest/voi20_day2
 Detail solutions here:<br/>
 https://leduythuccs.github.io/2020-02-23-VOI2020Solution-day1/<br/>
 https://leduythuccs.github.io/2020-04-14-VOI2020Solution-day2/
+
+Accepted: 1, 4
+Solutions: 2, 3, 5, 6
