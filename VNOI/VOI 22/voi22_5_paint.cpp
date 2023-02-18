@@ -205,7 +205,7 @@ void SUB4()
     {
         while (nowADD <= cnt && ADD[nowADD].y1 <= QueryPoint[i].y)
         {
-            if (ADD[nowADD].y1 == QueryPoint[i].y && ADD[nowADD].x1 == QueryPoint[i].x) break;
+            if (ADD[nowADD].y1 == QueryPoint[i].y && ADD[nowADD].x1 >= QueryPoint[i].x) break;
             o_set.insert(ADD[nowADD]);
             nowADD++;
         }
