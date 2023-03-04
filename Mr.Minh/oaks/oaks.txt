@@ -1,0 +1,78 @@
+#include <bits/stdc++.h>
+#define fi(i, a, b) for( int i = a; i <= b; i++ )
+#define fid(i, a, b) for( int i = a; i >= b; i-- )
+#define getbit( x, i ) (( x>>i)&1)
+#define ll long long
+#define pb push_back
+#define pp pair<int,int>
+#define f first
+#define s second
+#define hien "OAKS"
+#define maxn 1009
+using namespace std;
+int n, a[maxn];
+int l[maxn], luu[maxn], xd[maxn][maxn], g[maxn][maxn];
+int cl[maxn], b[maxn], m;
+int dem = 0, kq[maxn];
+
+void cd( int l, int r ){
+    if( r <= l+1 ) return;
+    int mi = g[l][r];
+    cd( l, mi );cd( mi, r );
+    kq[++dem] = mi;
+}
+
+int main()
+{
+	ios_base::sync_with_stdio(0);
+	cin.tie(NULL); cout.tie(NULL);
+	freopen(hien".inp", "r", stdin);
+    freopen(hien".out", "w", stdout);
+    cin >> n;
+    fi( i, 1, n ) cin >> a[i];
+
+    fi( i, 1, n-1 ) xd[i][i+1] = 1;
+    fid( i, n, 1 )
+        fi( j, i+2, n ){
+            fi( t, i+1, j-1 ) {
+                if( xd[i][t] + xd[t][j] == 2 ) {
+                    if( a[t] > a[i] && a[t] > a[j] ){
+                        xd[i][j] = 1;
+                        g[i][j] = t;
+                        break;
+                    }
+                    if( a[t] < a[i] && a[t] < a[j] ){
+                        xd[i][j] = 1;
+                        g[i][j] = t;
+                        break;
+                    }
+                }
+            }
+
+        }
+//    fi( i, 1, n )
+//        fi( j, i+1, n ) cout << i << " " << j << " "<< xd[i][j] << " " << g[i][j] << '\n';
+    l[1] = 1;
+    fi( i, 2, n ){
+        fid( j, i-1, 1 ) if( l[j] != 0 && a[i] >= a[j] && xd[j][i] == 1 && l[i] < l[j] + 1 ){
+            l[i] = l[j] + 1;
+            luu[i] = j;
+        }
+    }
+    if( l[n] == 0 ){
+        cout << -1;
+        exit(0);
+    }
+    cout << n - l[n] << '\n';
+    int tg = n;
+    while( tg ){
+        cl[tg] = 1;
+        tg = luu[tg];
+    }
+    fi( i, 1, n ) if( cl[i] == 1 ) b[++m] = i;
+
+    fi( i, 2, m )
+        cd( b[i-1], b[i] );
+
+    fi( i, 1, dem ) cout << kq[i] << " ";
+}

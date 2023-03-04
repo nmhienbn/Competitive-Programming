@@ -1,0 +1,90 @@
+
+#include <bits/stdc++.h>
+#define fi(i, a, b) for(int i = (a), _b = (b); i <= _b; i++)
+#define fid(i, a, b) for(int i = (a), _b = (b); i >= _b; i--)
+#define gb(x, i) (((x) >> (i)) & 1)
+#define pii pair<int,int>
+#define pb push_back
+#define ll long long
+#define Irelia "maro"
+const int maxn = 1 << 20, N = 20;
+using namespace std;
+
+int n, m, q, b[maxn + 5];
+int flip[N + 5];
+ll f[N + 5][2];
+int bit[maxn + 5][2];
+pii a[maxn + 5];
+
+void UP(int x){
+    if (x == 0) bit[0][0]++;
+    else while (x < m){
+        bit[x][0]++;
+        x += x & -x;
+    }
+}
+
+void DOWN(int x){
+    bit[0][1]++;
+    while (x > 0){
+        bit[x][1]++;
+        x -= x & -x;
+    }
+}
+
+void Fup(int x){
+    if (x == 0) f[n - 1][1] += bit[0][1];
+    else while (x < m){
+        f[__builtin_ctz(x & -x)][1] += bit[x][1];
+        x += x & -x;
+    }
+}
+
+void Fdown(int x){
+    while (x > 0){
+        f[__builtin_ctz(x & -x)][0] += bit[x - (x & -x)][0];
+        x -= x & -x;
+    }
+}
+
+int main(){
+    ios_base::sync_with_stdio(0);
+    cin.tie(NULL);
+    freopen(Irelia".inp", "r", stdin);
+    freopen(Irelia".out", "w", stdout);
+    cin >> n;
+    m = (1 << n);
+    fi(i, 0, m - 1){
+        cin >> a[i].first;
+        a[i].second = i;
+    }
+    sort(a, a + m, greater<pii>());
+    int j = 0;
+    fi(i, 0, m - 1){
+        //memset(f, 0, sizeof(f));
+        //cout << a[i].second << '\n';
+        //fi(i, 0, m - 1) cout << bit[i][0] << ' '; cout << endl;
+        while (a[j].first != a[i].first){
+            UP(a[j].second);
+            DOWN(a[j].second);
+            j++;
+        }
+        Fdown(a[i].second);
+        Fup(a[i].second);
+//        fi(i, 0, n - 1){
+//            fi(j, 0, 1) cout << f[i][j] << ' ';
+//            cout << endl;
+//        }
+//        cout << endl;
+    }
+    cin >> q;
+    while (q--){
+        int x;
+        ll res = 0;
+        cin >> x;
+        fi(i, 0, x - 1) flip[i] ^= 1;
+        fi(i, 0, n - 1) res += f[i][flip[i]];
+        cout << res << '\n';
+    }
+
+}

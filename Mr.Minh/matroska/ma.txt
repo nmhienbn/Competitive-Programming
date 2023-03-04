@@ -1,0 +1,102 @@
+
+
+#include <bits/stdc++.h>
+#define fi(i,a,b) for(int i=a;i<=b;i++)
+#define fid(i,a,b) for(int i=a;i>=b;i--)
+#define pp pair <int,int>
+#define f first
+#define s second
+#define getbit(i,j) ((i >> j)&1)
+#define pb push_back
+#define name "MATROSKA"
+#define maxn 100009
+using namespace std;
+int n, a[maxn];
+pp b[maxn];
+int xd1[maxn], xd2[maxn];
+int gt[maxn];
+pp st[maxn*4];
+void co(){
+    fi(i, 1, n) b[i].f = a[i], b[i].s = i;
+    sort(b+1, b+n+1);
+    b[0].f = b[1].f-1;
+    int tg = 0;
+    fi(i, 1, n){
+        if(b[i].f != b[i-1].f) tg++;
+        a[b[i].s] = tg;
+    }
+}
+
+void build(int id, int l, int r){
+    if(l == r){
+        st[id].f = gt[l];
+        return;
+    }
+    int m = (l+r)/2;
+    build(id*2, l, m);
+    build(id*2+1, m+1, r);
+    st[id].f = min(st[id*2].f, st[id*2+1].f);
+}
+
+void lazy(int id){
+    int tg = st[id].s;
+    st[id*2].f += tg;
+    st[id*2].s += tg;
+    st[id*2+1].f += tg;
+    st[id*2+1].s += tg;
+    st[id].s = 0;
+}
+
+void ud(int id, int l, int r, int d, int c, int val){
+    if(r < d || c < l) return;
+    if(d <= l && r <= c){
+        st[id].f += val;
+        st[id].s += val;
+        return;
+    }
+    lazy(id);
+    int m = (l+r)/2;
+    ud(id*2, l, m, d, c, val);
+    ud(id*2+1, m+1, r, d, c, val);
+    st[id].f = min(st[id*2].f, st[id*2+1].f);
+
+}
+
+void check(int i){
+    if(st[1].f >= 0){
+        cout << i;
+        exit(0);
+    }
+    return;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(0);
+    cin.tie(NULL);cout.tie(NULL);
+    freopen(name".inp","r",stdin);
+    freopen(name".out","w",stdout);
+    cin >> n;
+    fi(i, 1, n) cin >> a[i];
+    co();
+    int mo = 0;
+    fi(i, 1, n) mo = max(mo, a[i]);
+
+    int t = n/2;
+    fi(i, 1, t) xd1[a[i]]++;
+    fi(i, t+1, t*2) xd2[a[i]]++;
+    fid(i, mo, 1) gt[i] = gt[i+1] + xd2[i+1] - xd1[i];
+    build(1, 1, mo);
+    fid(i, t, 1){
+        check(i);
+        int y1 = a[i*2];
+        int y2 = a[i*2-1];
+        int x1 = a[i];
+        ud(1, 1, mo, 1, y1-1, -1);
+        ud(1, 1, mo, 1, y2-1, -1);
+        ud(1, 1, mo, 1, x1-1, 1);
+        ud(1, 1, mo, 1, x1, 1);
+    }
+    cout << 0;
+}
+

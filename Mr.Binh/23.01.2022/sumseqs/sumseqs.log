@@ -1,0 +1,157 @@
+#include <bits/stdc++.h>
+#define fi(i, a, b) for(int i = (a), _b = (b); i <= _b; i++)
+#define fid(i, a, b) for(int i = (a), _b = (b); i >= _b; i--)
+#define gb(x, i) (((x) >> (i)) & 1)
+#define pii pair<int,int>
+#define pb push_back
+#define ll long long
+#define Irelia "sumseqs"
+const int maxn = 5e5 + 5, mod = 1e9;
+using namespace std;
+
+int n, a[maxn], prem[maxn], preM[maxn], now;
+int q[maxn], top;
+ll res;
+
+struct dl {
+    int L, m, M, mL, ML, mM, mML, len, lzL, lzm, lzM;
+    void print(){
+        cout << L << ' ' << m << ' ' << M << ' ' << mL << ' ' << ML
+        << ' ' << mM << ' ' << mML << ' ' << len << ' ' << lzL << ' ' << lzm << ' ' << lzM;
+        cout << endl;
+    }
+} st[maxn << 3];
+void build(int id, int l, int r){
+    st[id].len = r - l + 1;
+    if (l == r) return;
+    int m = (l + r) >> 1;
+    build(id * 2, l, m);
+    build(id * 2 + 1, m + 1, r);
+}
+void merge(dl& c, dl a, dl b){
+    c.L = a.L + b.L;
+    c.m = a.m + b.m;
+    c.M = a.M + b.M;
+    c.mL = a.mL + b.mL;
+    c.ML = a.ML + b.ML;
+    c.mML = a.mML + b.mML;
+    //c.print();
+}
+void lazy(int id){
+    dl& c = st[id];
+    if (c.lzL){
+        int d = c.lzL * c.len;
+        c.L = (c.L + d) % mod;
+        c.mL = (c.mL + 1ll * d * c.m) % mod;
+        c.ML = (c.ML + 1ll * d * c.M) % mod;
+        c.mML = (c.mML + 1ll * d * c.mM) % mod;
+        st[id * 2].lzL = st[id * 2 + 1].lzL = c.lzL;
+        c.lzL = 0;
+        return;
+    }
+    if (c.lzm){
+        int v = c.lzm * c.len;
+        c.m = v;
+        c.mL = 1ll * v * c.L % mod;
+        c.mM = 1ll * v * c.M % mod;
+        c.mML = 1ll * v * c.ML % mod;
+        st[id * 2].lzm = st[id * 2 + 1].lzm = c.lzm;
+        c.lzm = 0;
+        return;
+    }
+    if (c.lzM){
+        int V = c.lzM * c.len;
+        c.M = V;
+        c.ML = 1ll * V * c.L % mod;
+        c.mM = 1ll * V * c.m % mod;
+        c.mML = 1ll * V * c.mL % mod;
+        st[id * 2].lzM = st[id * 2 + 1].lzM = c.lzM;
+        c.lzM = 0;
+        return;
+    }
+}
+void down(int id){
+    lazy(id * 2);
+    lazy(id * 2 + 1);
+}
+void addL(int id, int l, int r, int d, int c, int val){
+    if (r < d || l > c || d > c) return;
+    if (d <= l && r <= c){
+        st[id].lzL += val;
+        lazy(id);
+        return;
+    }
+    int m = (l + r) >> 1;
+    down(id);
+    addL(id * 2, l, m, d, c, val);
+    addL(id * 2 + 1, m + 1, r, d, c, val);
+    merge(st[id], st[id * 2], st[id * 2 + 1]);
+}
+void udm(int id, int l, int r, int d, int c, int val){
+    if (r < d || l > c || d > c) return;
+    if (d <= l && r <= c){
+        st[id].lzm = val;
+        lazy(id);
+        return;
+    }
+    int m = (l + r) >> 1;
+    down(id);
+    udm(id * 2, l, m, d, c, val);
+    udm(id * 2 + 1, m + 1, r, d, c, val);
+    merge(st[id], st[id * 2], st[id * 2 + 1]);
+}
+void udM(int id, int l, int r, int d, int c, int val){
+    if (r < d || l > c || d > c) return;
+    if (d <= l && r <= c){
+        st[id].lzM = val;
+        lazy(id);
+        return;
+    }
+    int m = (l + r) >> 1;
+    down(id);
+    udM(id * 2, l, m, d, c, val);
+    udM(id * 2 + 1, m + 1, r, d, c, val);
+    merge(st[id], st[id * 2], st[id * 2 + 1]);
+}
+
+void calcPre(){
+    fi(i, 1, n){
+        while (top && a[q[top]] > a[i]) top--;
+        prem[i] = q[top];
+        q[++top] = i;
+    }
+    top = 0;
+    fi(i, 1, n){
+        while (top && a[q[top]] < a[i]) top--;
+        preM[i] = q[top];
+        q[++top] = i;
+    }
+}
+
+int main(){
+    ios_base::sync_with_stdio(0);
+    cin.tie(NULL);
+    freopen(Irelia".inp", "r", stdin);
+    freopen(Irelia".out", "w", stdout);
+    cin >> n;
+    fi(i, 1, n){
+        cin >> a[i];
+    }
+    build(1, 1, n);
+    calcPre();
+    fi(i, 1, n){
+        now = i;
+        addL(1, 1, n, 1, i, 1);
+        //st[1].print();
+        udm(1, 1, n, prem[i] + 1, i, a[i]);
+        //st[1].print();
+        udM(1, 1, n, preM[i] + 1, i, a[i]);
+        st[1].print();
+        fi(i, 2, 3) st[i].print();
+        res += st[1].mML;
+        if (res >= mod) res -= mod;
+        cout << res << '\n';
+    }
+    cout << res;
+}
+

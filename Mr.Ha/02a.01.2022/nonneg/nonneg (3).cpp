@@ -1,0 +1,118 @@
+#include <bits/stdc++.h>
+#define fi(i, a, b) for(int i = a; i <= b; i++)
+#define fid(i, a, b) for(int i = a; i >= b; i--)
+#define bit(x, i) ((x >> i) & 1)
+#define ll long long
+#define pii pair <int, int>
+#define pb push_back
+#define Irelia "nonneg"
+const int maxn = 5e4+5;
+
+using namespace std;
+
+int n, m, w, s, d[maxn], tp[maxn], id, cnt[maxn];
+bool res[maxn];
+vector<pii> a[maxn], b[maxn];
+vector<int> st[maxn];
+pii c[maxn];
+
+void dfs(int u){
+    tp[u] = id;
+    for (auto vt : a[u]){
+        int v = vt.first;
+        if (!tp[v]) dfs(v);
+    }
+}
+
+void component(){
+    fi(i, 1, m){
+        int u, v, t;
+        cin >> u >> v >> t;
+        a[u].pb({v, t});
+        a[v].pb({u, t});
+    }
+    fi(i, 1, n) if (!tp[i]){
+        id++;
+        dfs(i);
+    }
+}
+
+void dfs2(int u){
+    res[u] = 1;
+    for (auto vt : a[u]){
+        int v = vt.first;
+        if (!res[v]) dfs2(v);
+    }
+    for (auto vt : b[u]){
+        int v = vt.first;
+        if (!res[v]) dfs2(v);
+    }
+}
+
+void step(){
+    fi(i, 1, w){
+        int u, v, t;
+        cin >> u >> v >> t;
+        b[u].pb({v, t});
+        c[i] = {u, v};
+    }
+    dfs2(s);
+    fi(i, 1, w){
+        int u = c[i].first, v = c[i].second;
+        if (res[u]){
+            cnt[tp[v]]++;
+            st[tp[v]].pb(v);
+        }
+    }
+}
+
+void Dijkstra(){
+    fi(i, 1, n) d[i] = 1e9;
+    d[s] = 0;
+    priority_queue<pii, vector<pii>, greater<pii>> q;
+    q.push({0, s});
+    while (q.size()){
+        int u = q.top().second, C = q.top().first;
+        q.pop();
+        if (C > d[u]) continue;
+        for (auto vt : a[u]){
+            int v = vt.first, t = vt.second;
+            if (d[v] > d[u] + t){
+                d[v] = d[u] + t;
+                q.push({d[v], v});
+            }
+        }
+        for (auto vt : b[u]){
+            int v = vt.first, t = vt.second;
+            if (d[v] > d[u] + t){
+                d[v] = d[u] + t;
+            }
+            cnt[tp[v]]--;
+            if (cnt[tp[v]] == 0){
+                for (auto id : st[tp[v]]){
+                    q.push({d[id], id});
+                }
+            }
+        }
+    }
+}
+
+void solve(){
+    fi(i, 1, n){
+        if (!res[i]) cout << "NO PATH\n";
+        else cout << d[i] << '\n';
+    }
+}
+
+int main(){
+    ios_base::sync_with_stdio(0);
+    cin.tie(NULL);
+    freopen(Irelia".inp", "r", stdin);
+    freopen(Irelia".out", "w", stdout);
+    cin >> n >> m >> w >> s;
+    component();
+    step();
+    Dijkstra();
+    solve();
+}
+

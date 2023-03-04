@@ -1,0 +1,94 @@
+
+#include <bits/stdc++.h>
+#define fi(i, a, b) for(int i = (a), _b = (b); i <= _b; i++)
+#define fid(i, a, b) for(int i = (a), _b = (b); i >= _b; i--)
+#define gb(x, i) (((x) >> (i)) & 1)
+#define ll long long
+#define pii pair <int, int>
+#define pb push_back
+#define Irelia "fixstr"
+const int maxn = 1e6 + 5;
+
+using namespace std;
+
+struct dl {
+    int f, s, t;
+};
+
+int n, a[maxn], T[maxn * 4];
+string s[maxn];
+char typ;
+vector<dl> st[maxn * 4];
+
+dl combine(dl a, dl b){
+    return {min(a.back().f, b.back().f),
+        max(a.back().s, b.back().s), max(a.back().t, b.back().t)};
+}
+
+void lazy(int id){
+
+}
+
+void build(int id, int l, int r){
+    if (l == r){
+        st[id].pb({a[l], a[l], 0});
+        return;
+    }
+    int m = (l + r) >> 1;
+    build(id * 2, l, m);
+    build(id * 2 + 1, m + 1, r);
+    st[id].pb(combine(st[id * 2].back(), st[id * 2 + 1].back()));
+}
+
+void update(int id, int l, int r, int d, int c, int val, int vt){
+    if (r < d || l > c) return;
+    if (d <= l && r <= c){
+        st[id].pb({st[id].f + val, st[id].s + val, vt});
+        T[id]
+        return;
+    }
+    int m = (l + r) >> 1;
+    update(id * 2, l, m, d, c, val, vt);
+    update(id * 2 + 1, m + 1, r, d, c, val, vt);
+    st[id].pb(combine(st[id * 2].back(), st[id * 2 + 1].back()));
+}
+
+void update1(int id, int l, int r, int d, int c, int pos, int vt){
+    if (r < d || l > c) return;
+    if (d <= l && r <= c){
+        int L = 0, R = st[id].size();
+        R--;
+        while (L <= R){
+            int G = (L + R) >> 1;
+            if (st[id][G].t < pos) D = G + 1;
+            else C = G - 1;
+        }
+        st[id].pb({st[id][C].f, st[id][C].s, vt});
+        return;
+    }
+    int m = (l + r) >> 1;
+    update1(id * 2, l, m, d, c, pos, vt);
+    update1(id * 2 + 1, m + 1, r, d, c, pos, vt);
+    st[id].pb(combine(st[id * 2].back(), st[id * 2 + 1].back()));
+}
+
+dl get(int id, int l, int r, int d, int c){
+    if (r < d || l > c) return {1e9, -1e9, 0};
+    if (d <= l && r <= c) return st[id].back();
+    int m = (l + r) >> 1;
+    update(id * 2, l, m, d, c);
+    update(id * 2 + 1, m + 1, r, d, c);
+    combine(st[id * 2], st[id * 2 + 1], st[id]);
+}
+
+int main(){
+    ios_base::sync_with_stdio(0);
+    cin.tie(NULL);
+    freopen(Irelia".inp", "r", stdin);
+    freopen(Irelia".out", "w", stdout);
+    cin >> s;
+    n = s.size();
+    s = ' ' + s;
+    fi(i, 1, n) a[i] = a[i - 1] + (s[i] == '(' ? 1 : -1);
+    build(1, 1, n);
+}

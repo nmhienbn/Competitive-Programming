@@ -1,0 +1,54 @@
+#include <bits/stdc++.h>
+#define fi(i,a,b) for(int i=a;i<=b;i++)
+#define fid(i,a,b) for(int i=a;i>=b;i--)
+#define pp pair <int,int>
+#define f first
+#define s second
+#define getbit(i,j) ((i >> j)&1)
+#define pb push_back
+#define name "scales"
+#define maxn 1060009
+using namespace std;
+int n, m, C;
+int a[maxn], b[maxn];
+int h[maxn], k[maxn];
+
+void cbi1(){
+    fi( t, 1, (1<<n)-1 )
+        fi( i, 1, n ) if( getbit( t, i-1 ) ) h[t] += a[i];
+}
+
+void cbi2(){
+    fi( t, 1, (1<<m)-1 )
+        fi( i, 1, m ) if( getbit( t, i-1 ) ) k[t] += b[i];
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(0);
+    cin.tie(NULL);cout.tie(NULL);
+    freopen(name".inp","r",stdin);
+    freopen(name".out","w",stdout);
+    cin >> n >> C;
+    fi( i, 1, n ) cin >> a[i];
+
+    m = n/2; n = n-m;
+    fi( i, 1, m ) b[i] = a[n+i];
+    cbi1(); cbi2();
+    sort( k+1, k+(1<<m) );
+    int res = 0;
+
+    fi( t, 0, (1<<n)-1 ){
+        int ok = C - h[t];
+        int d = 0, c = (1<<m)-1;
+        while( d<=c ){
+            int g = (d+c)/2;
+            if( k[g] <= ok ) d = g+1;
+            else c = g-1;
+        }
+        res = max( res, h[t] + k[c] );
+    }
+    cout << res;
+
+}
+1
